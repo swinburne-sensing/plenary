@@ -1,11 +1,16 @@
 from abc import ABCMeta, abstractmethod
-import typing
+from collections import OrderedDict
+from typing import Any, Generic, Iterable, Optional, TypeVar, Union
 
 
 __all__ = [
+    'TRegistryEntry',
     'RegistryEntry',
     'Registry'
 ]
+
+
+TRegistryEntry = TypeVar('TRegistryEntry', bound='RegistryEntry')
 
 
 class RegistryEntry(metaclass=ABCMeta):
@@ -13,7 +18,7 @@ class RegistryEntry(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def registry_key(self) -> typing.Union[str, typing.Iterable[str]]:
+    def registry_key(self) -> Union[str, Iterable[str]]:
         """ Get the unique identifier for this object when placed in a Registry. Must be a valid Python attribute name
         (i.e. no special characters except '_', preferably lower case).
 
@@ -22,20 +27,17 @@ class RegistryEntry(metaclass=ABCMeta):
         pass
 
 
-_T_REGISTRY_ENTRY = typing.TypeVar('_T_REGISTRY_ENTRY', bound=RegistryEntry)
-
-
-class Registry(typing.Generic[_T_REGISTRY_ENTRY]):
+class Registry(Generic[TRegistryEntry]):
     """ Registry of instantiated classes. """
 
-    def __init__(self, initial: typing.Optional[typing.Iterable[_T_REGISTRY_ENTRY]] = None):
+    def __init__(self, initial: Optional[Iterable[TRegistryEntry]] = None):
         """
 
         :param initial: iterable for initial insertion into this Registry
         """
-        typing.Generic.__init__(self)
+        Generic.__init__(self)
 
-        self._registry: typing.Dict[str, _T_REGISTRY_ENTRY] = {}
+        self._registry = OrderedDict()
 
         if initial is not None:
             self.register_all(initial)
@@ -47,7 +49,7 @@ class Registry(typing.Generic[_T_REGISTRY_ENTRY]):
         return self._registry[self._safe_key(item)]
 
     def __setitem__(self, key, value):
-        raise NotImplementedError('Add items to registry using .register() method')
+        raise NotImplementedError('Add items to registry using Registry.register() method')
 
     def __getattr__(self, item):
         return self[item]
@@ -55,7 +57,7 @@ class Registry(typing.Generic[_T_REGISTRY_ENTRY]):
     def __iter__(self):
         return iter(self._registry.values())
 
-    def register(self, item: _T_REGISTRY_ENTRY) -> None:
+    def register(self, item: TRegistryEntry) -> None:
         """ Register an instance with the Registry.
 
         :param item:
@@ -71,7 +73,7 @@ class Registry(typing.Generic[_T_REGISTRY_ENTRY]):
         else:
             self._registry[self._safe_key(key)] = item
 
-    def register_all(self, item_iter: typing.Iterable[_T_REGISTRY_ENTRY]):
+    def register_all(self, item_iter: Iterable[TRegistryEntry]) -> None:
         """
 
         :param item_iter:
@@ -80,14 +82,18 @@ class Registry(typing.Generic[_T_REGISTRY_ENTRY]):
         for item in item_iter:
             self.register(item)
 
+    def sort(self) -> None:
+        """ Sort items in registry by key.
+
+        :return:
+        """
+        self._registry = OrderedDict(sorted(self._registry.items(), key=lambda x: x[0]))
+
     @classmethod
-    def _safe_key(cls, x: typing.Any) -> str:
+    def _safe_key(cls, x: Any) -> str:
         """ Generate a safe key from arbitrary input.
 
         :param x: input
         :return: Registry compatible key
         """
-        if not isinstance(x, str):
-            x = str(x)
-
         return x.replace(' ', '_').replace('-', '_').lower()
