@@ -12,11 +12,25 @@ except ImportError:
 from experimentutil import time
 
 
-class TimeTestCase(unittest.TestCase):
+class GeneralTestCase(unittest.TestCase):
+    def test_now(self):
+        t = time.now()
+
+        # Needs some timezone info
+        self.assertIsNotNone(t.tzinfo)
+
+    def test_now_utc(self):
+        t = time.now(False)
+
+        self.assertIsNotNone(t.tzinfo)
+        self.assertEqual(timezone.utc, t.tzinfo)
+
+
+class RoundingTestCase(unittest.TestCase):
     _DATETIME_ROUND_DOWN_MIN = datetime(2022, 6, 1, 0, 0, 0, 0)
     _DATETIME_ROUND_DOWN_MAX = datetime(2022, 6, 1, 11, 29, 29, 499999)
 
-    # FIXME Pythons rounding behaviour (from IEEE) makes 0.5 round to 0, so 1 ns is added to the test below
+    # Pythons rounding behaviour (from IEEE) makes 0.5 round to 0, so 1 μs is added to the test below
     _DATETIME_ROUND_UP_MIN = datetime(2022, 6, 1, 12, 30, 30, 500001)
     _DATETIME_ROUND_UP_MAX = datetime(2022, 6, 1, 23, 59, 59, 999999)
 
