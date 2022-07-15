@@ -1,21 +1,18 @@
 import functools
-import inspect
-import typing
 import sys
+from inspect import isabstract
+from importlib import import_module
+from pkgutil import walk_packages
+from typing import Any, List, Mapping, Type, TypeVar
 
 
 __all__ = [
-    'InstanceError',
-    'T_OBJECT',
+    'TObject',
     'get_subclasses',
     'reference_from_str',
     'instance_from_dict',
     'resolve_global'
 ]
-
-
-class InstanceError(Exception):
-    pass
 
 
 def __recurse_subclasses(subclass_list):
@@ -25,7 +22,7 @@ def __recurse_subclasses(subclass_list):
         if len(subclass.__subclasses__()) > 0:
             return_list.extend(__recurse_subclasses(subclass.__subclasses__()))
 
-            if not inspect.isabstract(subclass):
+            if not isabstract(subclass):
                 return_list.append(subclass)
         else:
             return_list.append(subclass)
@@ -33,10 +30,10 @@ def __recurse_subclasses(subclass_list):
     return return_list
 
 
-T_OBJECT = typing.TypeVar('T_OBJECT', bound=object)
+TObject = TypeVar('TObject', bound=object)
 
 
-def get_subclasses(class_root: typing.Type[T_OBJECT]) -> typing.List[typing.Type[T_OBJECT]]:
+def get_subclasses(class_root: Type[TObject]) -> List[Type[TObject]]:
     """ Get a list of subclasses for a given parent class.
 
     :param class_root: parent class type
@@ -45,7 +42,25 @@ def get_subclasses(class_root: typing.Type[T_OBJECT]) -> typing.List[typing.Type
     return __recurse_subclasses([class_root])
 
 
-def reference_from_str(name: str, parent: typing.Any):
+def import_submodules(package, recursive=True) -> None:
+    """ Import all submodules within a given package.
+
+    :param package: base package to begin import from
+    :param recursive: if True then import submodules
+    """
+    if isinstance(package, str):
+        package = import_module(package)
+
+    for loader, name, is_pkg in walk_packages(package.__path__):
+        full_name = package.__name__ + '.' + name
+
+        import_module(full_name)
+
+        if recursive and is_pkg:
+            import_submodules(full_name)
+
+
+def reference_from_str(name: str, parent: Any) -> Any:
     """ Get a class from a given module given the classes name as a string.
 
     :param name:
@@ -61,13 +76,16 @@ def reference_from_str(name: str, parent: typing.Any):
     return functools.reduce(getattr, name.split('.'), parent)
 
 
-def instance_from_dict(config: typing.Dict[str, typing.Any], parent: typing.Any):
+def instance_from_dict(config: Mapping[str, Any], parent: Any) -> Any:
     """ Instantiate a class from a given module given a dict containing the class name as a value in the dict.
 
     :param config: Object description as a dict, requires at least a value for 'class'
     :param parent: Parent module of class
     :return: class instance
     """
+    # Create mutable copy of configuration
+    config = dict(config)
+
     if 'class' in config:
         class_name = config.pop('class')
 
@@ -78,10 +96,10 @@ def instance_from_dict(config: typing.Dict[str, typing.Any], parent: typing.Any)
 
         return reference_from_str(method_name, parent)
     else:
-        raise InstanceError('Configuration dictionary requires either "class" or "method" key')
+        raise KeyError('Configuration dictionary requires either "class" or "method" key')
 
 
-def resolve_global(name: str) -> typing.Any:
+def resolve_global(name: str) -> Any:
     """ Resolve a global method, class or module name, importing as required.
 
     :param name:
