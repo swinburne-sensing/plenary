@@ -85,6 +85,7 @@ pyvenv.cfg
 .venv
 pip-selfcheck.json
 
+scratch/
 venv_*
 
 ### Linux template
