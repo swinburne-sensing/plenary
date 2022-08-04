@@ -22,7 +22,7 @@ class RegistryEntry(metaclass=ABCMeta):
         """ Get the unique identifier for this object when placed in a Registry. Must be a valid Python attribute name
         (i.e. no special characters except '_', preferably lower case).
 
-        :return: str
+        :return: registry key string
         """
         pass
 
@@ -31,9 +31,9 @@ class Registry(Generic[TRegistryEntry]):
     """ Registry of instantiated classes. """
 
     def __init__(self, initial: Optional[Iterable[TRegistryEntry]] = None):
-        """
+        """ Create a new registry, optionally populated with provided objects.
 
-        :param initial: iterable for initial insertion into this Registry
+        :param initial: iterable of objects subclassing RegistryEntry for initial population
         """
         object.__init__(self)
 
@@ -60,7 +60,7 @@ class Registry(Generic[TRegistryEntry]):
     def register(self, item: TRegistryEntry) -> None:
         """ Register an instance with the Registry.
 
-        :param item:
+        :param item: object subclassing RegistryEntry
         """
         if not isinstance(item, RegistryEntry):
             raise ValueError()
@@ -74,10 +74,9 @@ class Registry(Generic[TRegistryEntry]):
             self._registry[self._safe_key(key)] = item
 
     def register_all(self, item_iter: Iterable[TRegistryEntry]) -> None:
-        """
+        """ Register all items in an iterable with the registry.
 
-        :param item_iter:
-        :return:
+        :param item_iter: iterable of objects subclassing RegistryEntry
         """
         for item in item_iter:
             self.register(item)
@@ -85,7 +84,6 @@ class Registry(Generic[TRegistryEntry]):
     def sort(self) -> None:
         """ Sort items in registry by key.
 
-        :return:
         """
         self._registry = OrderedDict(sorted(self._registry.items(), key=lambda x: x[0]))
 
