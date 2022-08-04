@@ -3,7 +3,8 @@ import sys
 from inspect import isabstract
 from importlib import import_module
 from pkgutil import walk_packages
-from typing import Any, List, Mapping, Type, TypeVar
+from typing import Any, List, Mapping, Type, TypeVar, Union
+from types import ModuleType
 
 
 __all__ = [
@@ -15,12 +16,15 @@ __all__ = [
 ]
 
 
-def __recurse_subclasses(subclass_list):
+TObject = TypeVar('TObject', bound=object)
+
+
+def _recurse_subclasses(subclass_list: List[Type[TObject]]) -> List[Type[TObject]]:
     return_list = []
 
     for subclass in subclass_list:
         if len(subclass.__subclasses__()) > 0:
-            return_list.extend(__recurse_subclasses(subclass.__subclasses__()))
+            return_list.extend(_recurse_subclasses(subclass.__subclasses__()))
 
             if not isabstract(subclass):
                 return_list.append(subclass)
@@ -30,19 +34,16 @@ def __recurse_subclasses(subclass_list):
     return return_list
 
 
-TObject = TypeVar('TObject', bound=object)
-
-
 def get_subclasses(class_root: Type[TObject]) -> List[Type[TObject]]:
     """ Get a list of subclasses for a given parent class.
 
     :param class_root: parent class type
     :return: list
     """
-    return __recurse_subclasses([class_root])
+    return _recurse_subclasses([class_root])
 
 
-def import_submodules(package, recursive=True) -> None:
+def import_submodules(package: Union[str, ModuleType], recursive: bool = True) -> None:
     """ Import all submodules within a given package.
 
     :param package: base package to begin import from
@@ -106,14 +107,14 @@ def resolve_global(name: str) -> Any:
     :return:
     """
     # Split name
-    name = name.split('.')
+    name_split = name.split('.')
 
     # Find root object
-    obj_name = name.pop(0)
+    obj_name = name_split.pop(0)
     obj = __import__(obj_name)
 
-    while len(name) > 0:
-        attr_name = name.pop(0)
+    while len(name_split) > 0:
+        attr_name = name_split.pop(0)
         obj_name = obj_name + '.' + attr_name
 
         try:

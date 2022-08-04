@@ -3,7 +3,7 @@ from datetime import timezone
 from getpass import getuser
 from socket import getfqdn
 from tempfile import gettempdir
-from typing import Mapping
+from typing import Any, Mapping
 
 from experimentutil import constant, localtime
 
@@ -22,7 +22,7 @@ _format_system: Mapping[str, str] = {
 }
 
 
-def generate_format(format_spec: str, *args, **kwargs) -> str:
+def generate_format(format_spec: str, *args: Any, **kwargs: Any) -> str:
     """ Format specified string with system and environment variables.
 
     :param format_spec: formatted string specification

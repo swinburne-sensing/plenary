@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
-from typing import Any, Generic, Iterable, Optional, TypeVar, Union
+from typing import Any, Generic, Iterable, Iterator, Optional, MutableMapping, TypeVar, Union
 
 
 __all__ = [
@@ -35,26 +35,26 @@ class Registry(Generic[TRegistryEntry]):
 
         :param initial: iterable for initial insertion into this Registry
         """
-        Generic.__init__(self)
+        object.__init__(self)
 
-        self._registry = OrderedDict()
+        self._registry: MutableMapping[str, TRegistryEntry] = OrderedDict()
 
         if initial is not None:
             self.register_all(initial)
 
-    def __contains__(self, item):
+    def __contains__(self, item: Any) -> bool:
         return self._safe_key(item) in self._registry
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: Any) -> TRegistryEntry:
         return self._registry[self._safe_key(item)]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Any, value: Any) -> None:
         raise NotImplementedError('Add items to registry using Registry.register() method')
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: Any) -> TRegistryEntry:
         return self[item]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[TRegistryEntry]:
         return iter(self._registry.values())
 
     def register(self, item: TRegistryEntry) -> None:
@@ -96,4 +96,4 @@ class Registry(Generic[TRegistryEntry]):
         :param x: input
         :return: Registry compatible key
         """
-        return x.replace(' ', '_').replace('-', '_').lower()
+        return str(x).replace(' ', '_').replace('-', '_').lower()
