@@ -1,4 +1,5 @@
-from typing import Any, Iterable, Sequence
+import collections.abc
+from typing import Generator, Iterable, Iterator, Sequence, Tuple, TypeVar
 from itertools import tee
 
 
@@ -9,16 +10,33 @@ __all__ = [
 ]
 
 
-def flatten(iterable: Iterable[Any]):
+TItem = TypeVar('TItem')
+
+
+def flatten(iterable: Iterable[TItem], flatten_str: bool = False) -> Iterator[TItem]:
+    """ Flatten an iterable containing iterable sub-objects into a one-dimensional iterator.
+
+    :param iterable: input sequence
+    :param flatten_str: if True string objects in iterable are iterated, otherwise strings are returned whole
+    :return: flattened sequence
+    """
     for item in iterable:
-        if hasattr(item, '__iter__'):
-            for sub_item in flatten(item):
+        if isinstance(item, str):
+            if len(item) == 1:
+                yield item[0]
+            elif flatten_str:
+                for char in item:
+                    yield char
+            else:
+                yield item
+        elif isinstance(item, collections.abc.Iterable):
+            for sub_item in flatten(item, flatten_str):
                 yield sub_item
         else:
             yield item
 
 
-def chunk(data: Sequence[Any], size: int):
+def chunk(data: Sequence[TItem], size: int) -> Generator[Sequence[TItem], None, None]:
     """ Get iterator to return portions of a sequence in chunks of a maximum size.
 
     :param data: input sequence
@@ -32,7 +50,7 @@ def chunk(data: Sequence[Any], size: int):
         yield data[n:n + size]
 
 
-def pair(data: Iterable[Any]):
+def pair(data: Iterable[TItem]) -> Iterator[Tuple[TItem, TItem]]:
     """ Get iterator to return pairs of elements from an iterable.
 
     :param data: input iterator

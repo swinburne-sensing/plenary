@@ -14,35 +14,156 @@ class FlattenTestCase(unittest.TestCase):
     def test_list_elements_in_list(self):
         self.assertListEqual(
             [1, 2, 3, 4],
-            list(iterate.flatten([[1], [2], [3], [4]])),
+            list(iterate.flatten(
+                [
+                    [
+                        1
+                    ],
+                    [
+                        2
+                    ],
+                    [
+                        3
+                    ],
+                    [
+                        4
+                    ]
+                ]
+            )),
             'Incorrect flattening of elements in individual lists within a list'
         )
 
     def test_list_in_list(self):
         self.assertListEqual(
             [1, 2, 3, 4],
-            list(iterate.flatten([[1, 2, 3, 4]])),
+            list(iterate.flatten(
+                [
+                    [
+                        1,
+                        2,
+                        3,
+                        4
+                    ]
+                ]
+            )),
             'Incorrect flattening of list within list'
         )
 
     def test_equal_sublist(self):
         self.assertListEqual(
             [1, 2, 3, 4],
-            list(iterate.flatten([[1, 2], [3, 4]])),
+            list(iterate.flatten(
+                [
+                    [
+                        1,
+                        2
+                    ],
+                    [
+                        3,
+                        4
+                    ]
+                ]
+            )),
             'Incorrect flattening of lists within list with same length'
         )
 
     def test_sublist(self):
         self.assertListEqual(
             [1, 2, 3, 4],
-            list(iterate.flatten([[1, 2], [3], [4]])),
+            list(iterate.flatten(
+                [
+                    [
+                        1,
+                        2
+                    ],
+                    [
+                        3
+                    ],
+                    [
+                        4
+                    ]
+                ]
+            )),
             'Incorrect flattening of lists within list with mixed length'
         )
 
     def test_iterables(self):
         self.assertListEqual(
             [1, 2, 3, 4],
-            list(iterate.flatten([[1, 2], (3,), {4}])),
+            list(iterate.flatten(
+                [
+                    [
+                        1,
+                        2
+                    ],
+                    (
+                        3,
+                    ),
+                    {
+                        4
+                    }
+                ]
+            )),
+            'Incorrect flattening of iterables within list'
+        )
+
+    def test_strings(self):
+        self.assertListEqual(
+            ['hello', 'world', 'where', 'is', 'the', 'cake'],
+            list(iterate.flatten(
+                [
+                    [
+                        'hello',
+                        'world'
+                    ],
+                    (
+                        [
+                            'where'
+                        ],
+                    ),
+                    {
+                        'is'
+                    },
+                    [
+                        [
+                            'the',
+                        ],
+                        [
+                            'cake',
+                        ]
+                    ]
+                ]
+            )),
+            'Incorrect flattening of iterables within list'
+        )
+
+    def test_strings_iterate(self):
+        self.assertListEqual(
+            list('helloworldwhereisthecake'),
+            list(iterate.flatten(
+                [
+                    [
+                        'hello',
+                        'world'
+                    ],
+                    (
+                        [
+                            'where'
+                        ],
+                    ),
+                    {
+                        'is'
+                    },
+                    [
+                        [
+                            'the',
+                        ],
+                        [
+                            'cake',
+                        ]
+                    ]
+                ], True
+            )),
             'Incorrect flattening of iterables within list'
         )
 
