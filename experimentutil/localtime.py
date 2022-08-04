@@ -2,6 +2,9 @@ from datetime import datetime, timedelta, timezone
 
 
 __all__ = [
+    'datetime',
+    'timedelta',
+    'timezone',
     'now',
     'time_round'
 ]
