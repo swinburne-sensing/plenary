@@ -9,18 +9,18 @@ except ImportError:
     # noinspection PyPackageRequirements,PyUnresolvedReferences
     from backports.zoneinfo import ZoneInfo
 
-from experimentutil import time
+from experimentutil import localtime
 
 
 class GeneralTestCase(unittest.TestCase):
     def test_now(self):
-        t = time.now()
+        t = localtime.now()
 
         # Needs some timezone info
         self.assertIsNotNone(t.tzinfo)
 
     def test_now_utc(self):
-        t = time.now(False)
+        t = localtime.now(False)
 
         self.assertIsNotNone(t.tzinfo)
         self.assertEqual(timezone.utc, t.tzinfo)
@@ -37,62 +37,62 @@ class RoundingTestCase(unittest.TestCase):
     def _assert_round_down(self, t):
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour, t.minute, t.second, 0, t.tzinfo),
-            time.time_round(t, timedelta(seconds=1)),
+            localtime.time_round(t, timedelta(seconds=1)),
             'Incorrect rounding down to the nearest second'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour, t.minute, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(minutes=1)),
+            localtime.time_round(t, timedelta(minutes=1)),
             'Incorrect rounding down to the nearest minute'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour, 0, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(hours=1)),
+            localtime.time_round(t, timedelta(hours=1)),
             'Incorrect rounding down to the nearest hour'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day, 0, 0, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(days=1)),
+            localtime.time_round(t, timedelta(days=1)),
             'Incorrect rounding down to the nearest day'
         )
 
         # self.assertEqual(
         #     datetime(t.year, t.month, t.day, 0, 0, 0, 0, t.tzinfo),
-        #     time.time_round(t, timedelta(weeks=1)),
+        #     localtime.time_round(t, timedelta(weeks=1)),
         #     'Incorrect rounding down to the nearest week'
         # )
 
     def _assert_round_up(self, t):
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour, t.minute, t.second + 1, 0, t.tzinfo),
-            time.time_round(t, timedelta(seconds=1)),
+            localtime.time_round(t, timedelta(seconds=1)),
             'Incorrect rounding up to the nearest second'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour, t.minute + 1, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(minutes=1)),
+            localtime.time_round(t, timedelta(minutes=1)),
             'Incorrect rounding up to the nearest minute'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day, t.hour + 1, 0, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(hours=1)),
+            localtime.time_round(t, timedelta(hours=1)),
             'Incorrect rounding up to the nearest hour'
         )
 
         self.assertEqual(
             datetime(t.year, t.month, t.day + 1, 0, 0, 0, 0, t.tzinfo),
-            time.time_round(t, timedelta(days=1)),
+            localtime.time_round(t, timedelta(days=1)),
             'Incorrect rounding up to the nearest day'
         )
 
         # self.assertEqual(
         #     datetime(t.year, t.month, t.day + 1, 0, 0, 0, 0, t.tzinfo),
-        #     time.time_round(t, timedelta(weeks=1)),
+        #     localtime.time_round(t, timedelta(weeks=1)),
         #     'Incorrect rounding up to the nearest week'
         # )
 
@@ -137,7 +137,7 @@ class RoundingTestCase(unittest.TestCase):
         # Timestamps before DST change
         self.assertEqual(
             datetime(2022, 4, 2, 16, 0, 0, tzinfo=timezone.utc).astimezone(tz),
-            time.time_round(
+            localtime.time_round(
                 datetime(2022, 4, 2, 15, 59, 59, tzinfo=timezone.utc).astimezone(tz),
                 timedelta(minutes=10)
             ),
@@ -147,7 +147,7 @@ class RoundingTestCase(unittest.TestCase):
         # Timestamps after DST change
         self.assertEqual(
             datetime(2022, 4, 2, 16, 0, 0, tzinfo=timezone.utc).astimezone(tz),
-            time.time_round(
+            localtime.time_round(
                 datetime(2022, 4, 2, 16, 0, 1, tzinfo=timezone.utc).astimezone(tz),
                 timedelta(minutes=10)
             ),
