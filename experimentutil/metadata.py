@@ -2,7 +2,7 @@ from getpass import getuser
 from os import getpid
 from socket import getfqdn
 from threading import current_thread
-from typing import Mapping
+from typing import Any, Mapping, Union
 
 
 __all__ = [
@@ -12,7 +12,16 @@ __all__ = [
 ]
 
 
-TMetadata = Mapping[str, str]
+TMetadata = Mapping[str, Union[int, str]]
+
+
+def map_str(d: Mapping[str, Any]) -> Mapping[str, str]:
+    """ Convert all entries in a mapping to string entries.
+
+    :param d: input dict
+    :return: dict with string values
+    """
+    return {k: str(v) for k, v in d.items()}
 
 
 def process_metadata() -> TMetadata:
