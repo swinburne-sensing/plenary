@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from typing import List, Type
 from unittest import mock
 
-from experimentutil import exception
+from plenary import exception
 
 
 class ExampleError(Exception):

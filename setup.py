@@ -10,7 +10,7 @@ _RE_URL_DEPENDENCY = re.compile(r'^[^:\s]+://[^#]+#egg=(.+)$')
 
 
 # Read properties from __init__.py
-with open(os.path.join(os.path.dirname(__file__), 'experimentutil', '__init__.py')) as file_init:
+with open(os.path.join(os.path.dirname(__file__), 'plenary', '__init__.py')) as file_init:
     content_init = file_init.read()
 
     version = re.search("__version__ = '([^']+)'", content_init).group(1)
@@ -22,7 +22,7 @@ with open(os.path.join(os.path.dirname(__file__), 'experimentutil', '__init__.py
 
 
 setup(
-    name='experimentutil',
+    name='plenary',
     version=version,
     description='A library of convenient utility methods and classes',
     long_description=open('README.md').read(),

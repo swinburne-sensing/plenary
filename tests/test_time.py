@@ -9,7 +9,7 @@ except ImportError:
     # noinspection PyPackageRequirements,PyUnresolvedReferences
     from backports.zoneinfo import ZoneInfo
 
-from experimentutil import localtime
+from plenary import localtime
 
 
 class GeneralTestCase(unittest.TestCase):

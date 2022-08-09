@@ -1,7 +1,7 @@
 import typing
 import unittest
 
-from experimentutil import storage
+from plenary import storage
 
 
 class Entry(storage.RegistryEntry):

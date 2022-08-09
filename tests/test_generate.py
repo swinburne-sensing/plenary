@@ -1,6 +1,6 @@
 import unittest
 
-from experimentutil import generate
+from plenary import generate
 
 
 class GeneralTestCase(unittest.TestCase):

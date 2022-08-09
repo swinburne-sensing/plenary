@@ -5,7 +5,7 @@ from socket import getfqdn
 from tempfile import gettempdir
 from typing import Any, Mapping
 
-from experimentutil import constant, localtime
+from plenary import constant, localtime
 
 
 __all__ = [

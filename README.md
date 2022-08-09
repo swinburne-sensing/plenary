@@ -1,6 +1,7 @@
-# experimentutil
+# plenary
 
-![python workflow](https://github.com/swinburne-sensing/experimentutil/actions/workflows/python.yml/badge.svg)
+![license](https://img.shields.io/github/license/swinburne-sensing/plenary) ![python workflow](https://github.com/swinburne-sensing/plenary/actions/workflows/python.yml/badge.svg) ![issues](https://img.shields.io/github/issues/swinburne-sensing/plenary)
+
 
 A library of convenient utility methods and classes. Designed to work in pure python.
 
@@ -9,7 +10,7 @@ A library of convenient utility methods and classes. Designed to work in pure py
 Developed at [Swinburne University of Technology](https://swin.edu.au). If used in an academic project, please consider citing this work as it helps attract funding and track research outputs:
 
 ```
-C. J. Harrison and M. Shafiei. experimentutil. (2022). [Online]. doi: http://dx.doi.org/xxxxx
+C. J. Harrison and M. Shafiei. plenary. (2022). [Online]. doi: http://dx.doi.org/xxxxx
 ```
 
 *This activity received funding from [ARENA](https://arena.gov.au) as part of ARENA’s Research and Development Program – Renewable Hydrogen for Export (Contract No. 2018/RND012). The views expressed herein are not necessarily the views of the Australian Government, and the Australian Government does not accept responsibility for any information or advice contained herein.*

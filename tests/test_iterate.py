@@ -1,6 +1,6 @@
 import unittest
 
-from experimentutil import iterate
+from plenary import iterate
 
 
 class FlattenTestCase(unittest.TestCase):
