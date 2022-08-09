@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from enum import Enum
 from typing import Any, Generator, Mapping, Optional
 
-
 __all__ = [
     'RebootCause',
     'reboot_check',

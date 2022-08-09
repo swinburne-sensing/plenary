@@ -5,7 +5,6 @@ from socket import getfqdn
 from threading import current_thread
 from typing import Any, Mapping, Union
 
-
 __all__ = [
     'TMetadata',
     'system_metadata',

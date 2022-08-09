@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, List, Iterable, Iterator, Optional, Tuple, Type
 from types import TracebackType
+from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
 
 
 @dataclass(frozen=True)

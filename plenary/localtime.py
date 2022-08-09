@@ -5,7 +5,6 @@ from typing import Union
 
 from plenary import constant
 
-
 __all__ = [
     'datetime',
     'timedelta',

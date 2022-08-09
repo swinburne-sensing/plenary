@@ -8,7 +8,6 @@ from typing import Any, Mapping
 
 from plenary import constant, localtime
 
-
 __all__ = [
     'generate_format'
 ]

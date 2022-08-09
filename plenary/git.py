@@ -4,7 +4,6 @@ import os.path
 import subprocess
 import typing
 
-
 __all__ = [
     'CommandNotFoundError',
     'GitCommandError',
