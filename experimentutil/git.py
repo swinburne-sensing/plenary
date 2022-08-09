@@ -31,7 +31,7 @@ def get_git_hash(path: typing.Optional[str] = None) -> str:
         # Get caller from stack and get filename
         caller = inspect.getmodule(inspect.stack()[1][0])
 
-        if caller is None:
+        if caller is None or caller.__file__ is None:
             raise FileNotFoundError('Unable to determine path of caller')
 
         path = os.path.dirname(caller.__file__)
