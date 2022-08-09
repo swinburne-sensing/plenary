@@ -3,6 +3,7 @@ import os.path
 import platform
 import subprocess
 import warnings
+# noinspection PyCompatibility
 import winreg
 from contextlib import contextmanager
 from enum import Enum
