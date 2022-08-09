@@ -27,6 +27,10 @@ class GeneralTestCase(unittest.TestCase):
 
 
 class ParseTestCase(unittest.TestCase):
+    def test_datetime(self):
+        dt = datetime(2022, 8, 5, 17, 26, 45)
+        self.assertEqual(dt, localtime.parse_datetime(dt))
+
     def test_str(self):
         dt = datetime(2022, 8, 5, 17, 26, 45)
         self.assertEqual(dt, localtime.parse_datetime('2022-08-05 17:26:45'))
@@ -35,25 +39,25 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(dt, localtime.parse_datetime('220805_172645'))
 
     def test_numeric(self):
-        dt = datetime(2022, 8, 5, 17, 26, 45)
+        dt = datetime(2022, 8, 5, 17, 26, 45, tzinfo=timezone.utc)
 
         with self.subTest('from int'):
-            self.assertEqual(dt, localtime.parse_datetime(1659684405))
+            self.assertEqual(dt, localtime.parse_datetime(1659720405))
 
         with self.subTest('from float'):
-            self.assertEqual(dt, localtime.parse_datetime(1659684405.0))
+            self.assertEqual(dt, localtime.parse_datetime(1659720405.0))
 
         with self.subTest('from string'):
-            self.assertEqual(dt, localtime.parse_datetime('1659684405'))
+            self.assertEqual(dt, localtime.parse_datetime('1659720405'))
 
         with self.subTest('from ms string'):
-            self.assertEqual(dt, localtime.parse_datetime('1659684405000m'))
+            self.assertEqual(dt, localtime.parse_datetime('1659720405000m'))
 
         with self.subTest('from us string'):
-            self.assertEqual(dt, localtime.parse_datetime('1659684405000000u'))
+            self.assertEqual(dt, localtime.parse_datetime('1659720405000000u'))
 
         with self.subTest('from ns string'):
-            self.assertEqual(dt, localtime.parse_datetime('1659684405000000000n'))
+            self.assertEqual(dt, localtime.parse_datetime('1659720405000000000n'))
 
     def test_invalid(self):
         with self.assertRaises(localtime.DateTimeParseError):

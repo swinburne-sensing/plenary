@@ -47,10 +47,11 @@ class DateTimeParseError(ValueError):
     pass
 
 
-def parse_datetime(value: TParseDateTime) -> datetime:
+def parse_datetime(value: TParseDateTime, numeric_utc: bool = True) -> datetime:
     """ Date/time or timestamp parser for use with argparse.
 
     :param value: input
+    :param numeric_utc: if True treat numeric values as UTC based, otherwise assume local
     :return: datetime
     :raises ValueError: on invalid input
     """
@@ -60,7 +61,10 @@ def parse_datetime(value: TParseDateTime) -> datetime:
 
     if isinstance(value, int) or isinstance(value, float):
         # Parse from timestamp
-        return datetime.fromtimestamp(value)
+        if numeric_utc:
+            return datetime.utcfromtimestamp(value).replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromtimestamp(value).astimezone()
 
     timestamp_match = _REGEX_TIMESTAMP.match(value.lower())
 
@@ -74,9 +78,10 @@ def parse_datetime(value: TParseDateTime) -> datetime:
         elif timestamp_match[2] == 'n':
             timestamp /= 1e9
 
-        dt = datetime.fromtimestamp(timestamp)
-
-        return dt
+        if numeric_utc:
+            return datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
+        else:
+            return datetime.fromtimestamp(timestamp).astimezone()
     else:
         try:
             # Try ISO format first
