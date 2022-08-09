@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-TMetadata = Mapping[str, Union[int, str]]
+TMetadata = Mapping[str, Union[None, int, str]]
 
 
 def map_str(d: Mapping[str, Any]) -> Mapping[str, str]:
@@ -21,7 +21,7 @@ def map_str(d: Mapping[str, Any]) -> Mapping[str, str]:
     :param d: input dict
     :return: dict with string values
     """
-    return {k: str(v) for k, v in d.items()}
+    return {k: str(v) for k, v in d.items() if v is not None}
 
 
 def process_metadata() -> TMetadata:
