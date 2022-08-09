@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "plenary"
+version = "1.3.2"
+description = "A library of convenient utility methods and classes"
+authors = ["Chris Harrison <629204+ravngr@users.noreply.github.com>"]
+license = "GPLv3"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+"backports.zoneinfo" = { version = "*", markers = "python_version < '3.9'" }
+tzdata = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

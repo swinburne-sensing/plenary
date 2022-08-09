@@ -296,4 +296,6 @@ dmypy.json
 cython_debug/
 
 
+# IDE and build system
 .idea/
+poetry.lock
