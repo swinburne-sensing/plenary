@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from datetime import timezone
 from getpass import getuser

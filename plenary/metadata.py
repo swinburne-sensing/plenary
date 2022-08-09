@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from getpass import getuser
 from os import getpid
 from socket import getfqdn

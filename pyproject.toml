@@ -10,6 +10,8 @@ python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 "backports.zoneinfo" = { version = "*", markers = "python_version < '3.9'" }
+pre-commit = "^4.3.0"
+pytest = "^7.1.0"
 tzdata = "*"
 
 [build-system]

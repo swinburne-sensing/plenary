@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 from typing import Any, Generic, Iterable, Iterator, Optional, MutableMapping, TypeVar, Union

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 from contextlib import contextmanager
 from typing import List, Type
