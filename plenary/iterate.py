@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 import collections.abc
-from typing import Generator, Iterable, Iterator, Sequence, Tuple, TypeVar
 from itertools import tee
-
+from typing import Generator, Iterable, Iterator, Sequence, Tuple, TypeVar
 
 __all__ = [
     'flatten',

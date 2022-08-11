@@ -1,6 +1,6 @@
 # plenary
 
-![license](https://img.shields.io/github/license/swinburne-sensing/plenary) ![python workflow](https://github.com/swinburne-sensing/plenary/actions/workflows/python.yml/badge.svg) ![issues](https://img.shields.io/github/issues/swinburne-sensing/plenary)
+![license](https://img.shields.io/github/license/swinburne-sensing/plenary) ![python version](https://img.shields.io/pypi/pyversions/plenary) ![testing](https://github.com/swinburne-sensing/plenary/actions/workflows/python.yml/badge.svg) ![issues](https://img.shields.io/github/issues/swinburne-sensing/plenary)
 
 
 A library of convenient utility methods and classes. Designed to work in pure python.

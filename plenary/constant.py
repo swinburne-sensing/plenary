@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 FORMAT_TIMESTAMP_CONSOLE: str = '%Y-%m-%d %H:%M:%S'
 FORMAT_TIMESTAMP_CONSOLE_SHORT: str = '%y-%m-%d %H:%M:%S'
 

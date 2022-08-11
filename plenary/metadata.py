@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 from getpass import getuser
 from os import getpid
 from socket import getfqdn
 from threading import current_thread
 from typing import Any, Mapping, Union
-
 
 __all__ = [
     'TMetadata',

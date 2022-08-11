@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from datetime import timezone
 from getpass import getuser
@@ -6,7 +7,6 @@ from tempfile import gettempdir
 from typing import Any, Mapping
 
 from plenary import constant, localtime
-
 
 __all__ = [
     'generate_format'

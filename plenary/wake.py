@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ctypes
 import os.path
 import platform
@@ -8,7 +9,6 @@ import winreg
 from contextlib import contextmanager
 from enum import Enum
 from typing import Any, Generator, Mapping, Optional
-
 
 __all__ = [
     'RebootCause',

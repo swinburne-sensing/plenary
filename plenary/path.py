@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import os
-
 
 __all__ = [
     'add_path'

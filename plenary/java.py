@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 import re
 import typing
-
 
 # Regex for finding assignments, i.e. <object name>.<variable name> = <value>;
 _RE_JS_ASSIGNMENT = re.compile(r'^([\w.]+)([\w\d\[\]]*)\s+=\s+([^;]+);$')

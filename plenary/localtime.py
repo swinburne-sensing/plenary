@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
 from plenary import constant
-
 
 __all__ = [
     'datetime',

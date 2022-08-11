@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 from random import choice
 from string import hexdigits
-
 
 __all__ = [
     'hex_str'
