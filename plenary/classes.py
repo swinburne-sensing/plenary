@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-import functools
-import sys
 from importlib import import_module
 from inspect import isabstract
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import Any, List, Mapping, Type, TypeVar, Union
+from typing import Any, List, Type, TypeVar, Union
 
 __all__ = [
     'TObject',
