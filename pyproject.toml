@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plenary"
-version = "1.4.1"
+version = "1.4.2"
 description = "A library of convenient utility methods and classes"
 authors = ["Chris Harrison <629204+ravngr@users.noreply.github.com>"]
 repository = "https://github.com/swinburne-sensing/plenary"
