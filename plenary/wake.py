@@ -27,6 +27,10 @@ WIN_ES_DISPLAY_REQUIRED = 0x00000002
 _OS = platform.system()
 
 
+class PlatformUnsupportedWarning(UserWarning):
+    pass
+
+
 class RebootCause(Enum):
     NONE = 'none'
 
@@ -92,6 +96,19 @@ def _win_powershell_wmi_check(name: str, flag: str) -> Optional[bool]:
 
 
 def reboot_check() -> Optional[RebootCause]:
+    """ Check if a pending reboot operation exists if supported by the current platform. Currently, only implemented for
+    Windows and Linux.
+
+    On Windows this checks several registry keys and tries to call to SCCM via WMI to check for AD related reboots.
+    Heavily inspired by the checks included in https://github.com/bcwilhite/PendingReboot.
+
+    On Linux this checks for existence of `/var/run/reboot-required`, which exists on some distributions indicating a
+    reboot is pending to update the Linux kernel.
+
+    This is by no means comprehensive, but should provide good coverage of most automatic reboots.
+
+    :return: RebootCause if it can be determined, or None if checking is unsupported
+    """
     # Determine platform
     if _OS == 'Windows':
         # Windows update
@@ -144,16 +161,16 @@ def reboot_check() -> Optional[RebootCause]:
 
         return RebootCause.NONE
     else:
-        warnings.warn(f"Reboot check not supported on platform {_OS!r}")
+        warnings.warn(f"Reboot check not supported on platform {_OS!r}", PlatformUnsupportedWarning)
 
     return None
 
 
 @contextmanager
 def wake_lock(display_lock: bool = False) -> Generator[None, None, None]:
-    """ Create contact manager providing a wake lock on supported platforms.
+    """ Create context manager providing a wake lock on supported platforms.
 
-    :return: None
+    :return: context manager
     """
     # Determine platform
     if _OS == 'Windows':
@@ -170,5 +187,5 @@ def wake_lock(display_lock: bool = False) -> Generator[None, None, None]:
         # Clear wake lock
         ctypes.windll.kernel32.SetThreadExecutionState(WIN_ES_CONTINUOUS)
     else:
-        warnings.warn(f"Wake lock not supported on platform {_OS!r}")
+        warnings.warn(f"Wake lock not supported on platform {_OS!r}", PlatformUnsupportedWarning)
         yield
