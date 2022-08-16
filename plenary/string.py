@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-from datetime import timezone
+from datetime import datetime, timezone
 from getpass import getuser
 from socket import getfqdn
 from tempfile import gettempdir
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional
 
 from plenary import constant, localtime
 
@@ -23,14 +23,15 @@ _format_system: Mapping[str, str] = {
 _format_env: Mapping[str, str] = {'env_' + env_var: env_val for env_var, env_val in os.environ.items()}
 
 
-def generate_format(format_spec: str, *args: Any, include_env: bool = True, include_system: bool = True,
-                    **kwargs: Any) -> str:
+def generate_format(format_spec: str, *args: Any, generate_timestamp: Optional[datetime] = None,
+                    include_env: bool = True, include_system: bool = True, **kwargs: Any) -> str:
     """ Format specified string with system and environment variables.
 
     Inclusion of environment variables (that may contain secrets) is optional but enabled by default.
 
     :param format_spec: formatted string specification
     :param args: additional position format arguments
+    :param generate_timestamp: timestamp for string generation, if None the current time is used
     :param include_env: if True allow access to environment variables
     :param include_system: if True allow access to system variables
     :param kwargs: additional keyword format arguments
@@ -38,25 +39,27 @@ def generate_format(format_spec: str, *args: Any, include_env: bool = True, incl
     :raises IndexError: on invalid format specification
     :raises KeyError: on format specification with unknown field codes
     """
-    timestamp = localtime.now()
-    timestamp_utc = timestamp.astimezone(timezone.utc)
+    if generate_timestamp is None:
+        generate_timestamp = localtime.now()
+
+    generate_timestamp_utc = generate_timestamp.astimezone(timezone.utc)
 
     format_mapping = {
-        'date': timestamp.strftime(constant.FORMAT_DATE),
-        'date_utc': timestamp_utc.strftime(constant.FORMAT_DATE),
-        'time': timestamp.strftime(constant.FORMAT_TIME),
-        'time_utc': timestamp_utc.strftime(constant.FORMAT_TIME),
-        'datetime_filename': timestamp.strftime(constant.FORMAT_TIMESTAMP_FILENAME),
-        'datetime_console': timestamp.strftime(constant.FORMAT_TIMESTAMP_CONSOLE),
-        'datetime_utc_filename': timestamp_utc.strftime(constant.FORMAT_TIMESTAMP_FILENAME),
-        'datetime_utc_console': timestamp_utc.strftime(constant.FORMAT_TIMESTAMP_CONSOLE),
-        'datetime_iso': timestamp.isoformat(),
-        'datetime_utc_iso': timestamp_utc.isoformat(),
-        'datetime_utc_iso_z': timestamp_utc.isoformat().rsplit('+')[0] + 'Z',
-        'timestamp_s': str(int(timestamp.timestamp())),
-        'timestamp_ms': str(int(timestamp.timestamp() * 1e3)),
-        'timestamp_us': str(int(timestamp.timestamp() * 1e6)),
-        'timestamp_ns': str(int(timestamp.timestamp() * 1e9))
+        'date': generate_timestamp.strftime(constant.FORMAT_DATE),
+        'date_utc': generate_timestamp_utc.strftime(constant.FORMAT_DATE),
+        'time': generate_timestamp.strftime(constant.FORMAT_TIME),
+        'time_utc': generate_timestamp_utc.strftime(constant.FORMAT_TIME),
+        'datetime_filename': generate_timestamp.strftime(constant.FORMAT_TIMESTAMP_FILENAME),
+        'datetime_console': generate_timestamp.strftime(constant.FORMAT_TIMESTAMP_CONSOLE),
+        'datetime_utc_filename': generate_timestamp_utc.strftime(constant.FORMAT_TIMESTAMP_FILENAME),
+        'datetime_utc_console': generate_timestamp_utc.strftime(constant.FORMAT_TIMESTAMP_CONSOLE),
+        'datetime_iso': generate_timestamp.isoformat(),
+        'datetime_utc_iso': generate_timestamp_utc.isoformat(),
+        'datetime_utc_iso_z': generate_timestamp_utc.isoformat().rsplit('+')[0] + 'Z',
+        'timestamp_s': str(int(generate_timestamp.timestamp())),
+        'timestamp_ms': str(int(generate_timestamp.timestamp() * 1e3)),
+        'timestamp_us': str(int(generate_timestamp.timestamp() * 1e6)),
+        'timestamp_ns': str(int(generate_timestamp.timestamp() * 1e9))
     }
 
     if include_env:
@@ -67,4 +70,4 @@ def generate_format(format_spec: str, *args: Any, include_env: bool = True, incl
 
     format_mapping.update(kwargs)
 
-    return format(format_spec, *args, **format_mapping)
+    return format_spec.format(*args, **format_mapping)

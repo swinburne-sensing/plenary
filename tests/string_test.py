@@ -63,7 +63,7 @@ class StringTestCase(unittest.TestCase):
 
     def test_env_untrusted(self):
         with self.assertRaises(KeyError):
-            string.generate_format('{env_PATH}', trust=False)
+            string.generate_format('{env_PATH}', include_env=False)
 
 
 if __name__ == '__main__':
