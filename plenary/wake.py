@@ -4,11 +4,16 @@ import os.path
 import platform
 import subprocess
 import warnings
-# noinspection PyCompatibility
-import winreg
 from contextlib import contextmanager
 from enum import Enum
 from typing import Any, Generator, Mapping, Optional
+
+try:
+    # noinspection PyCompatibility
+    import winreg
+except ModuleNotFoundError:
+    winreg = None
+
 
 __all__ = [
     'RebootCause',
@@ -59,6 +64,9 @@ class RebootCause(Enum):
 
 
 def _win_reg_dict(hkey: int, sub_key: str) -> Mapping[str, Any]:
+    if winreg is None:
+        raise ModuleNotFoundError('Missing required module \'winreg\'')
+
     reg_dict = {}
 
     with winreg.OpenKey(hkey, sub_key) as key:
@@ -111,6 +119,9 @@ def reboot_check() -> Optional[RebootCause]:
     """
     # Determine platform
     if _OS == 'Windows':
+        if winreg is None:
+            raise ModuleNotFoundError('Missing required module \'winreg\'')
+
         # Windows update
         reg_key = _win_reg_dict(winreg.HKEY_LOCAL_MACHINE,
                                 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\')

@@ -13,8 +13,7 @@ class WakeTestCase(unittest.TestCase):
                 self.assertTrue(cause, 'Any non-none reboot cause should equate to True')
 
     def test_reboot_check(self):
-        reboot = wake.reboot_check()
-        self.assertIsInstance(reboot, wake.RebootCause)
+        _ = wake.reboot_check()
 
     def test_wake_lock(self):
         with wake.wake_lock():
