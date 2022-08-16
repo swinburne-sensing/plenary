@@ -20,3 +20,7 @@ class WakeTestCase(unittest.TestCase):
         with wake.wake_lock():
             # Just make sure nothing breaks...
             pass
+
+
+if __name__ == '__main__':
+    unittest.main()

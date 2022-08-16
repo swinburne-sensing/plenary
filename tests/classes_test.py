@@ -69,3 +69,7 @@ class ClassesTestCase(unittest.TestCase):
         with self.subTest('invalid attribute'):
             with self.assertRaises(ModuleNotFoundError):
                 _ = classes.resolve_global('tests.example.potato')
+
+
+if __name__ == '__main__':
+    unittest.main()
