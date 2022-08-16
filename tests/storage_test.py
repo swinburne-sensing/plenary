@@ -62,6 +62,18 @@ class RegistryTestCase(unittest.TestCase):
 
         self.assertIs(test_registry.hello, test_registry.world)
 
+    def test_content(self):
+        test_registry = storage.Registry()
+        test_entry = MultiEntry(['hello', 'world'])
+
+        test_registry.register(test_entry)
+
+        self.assertIn(test_entry, test_registry)
+        self.assertIn('hello', test_registry)
+        self.assertIn('world', test_registry)
+
+        self.assertSetEqual({test_entry}, test_registry.content)
+
     def test_register_iterate(self):
         test_registry = storage.Registry()
 

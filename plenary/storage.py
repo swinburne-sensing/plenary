@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
-from typing import (Any, Generic, Iterable, Iterator, MutableMapping, Optional,
-                    TypeVar, Union)
+from typing import (Any, FrozenSet, Generic, Iterable, Iterator,
+                    MutableMapping, Optional, Set, TypeVar, Union)
 
 __all__ = [
     'TRegistryEntry',
@@ -38,13 +38,18 @@ class Registry(Generic[TRegistryEntry]):
         """
         object.__init__(self)
 
+        self._content: Set[TRegistryEntry] = set()
         self._registry: MutableMapping[str, TRegistryEntry] = OrderedDict()
 
         if initial is not None:
             self.register_all(initial)
 
+    @property
+    def content(self) -> FrozenSet[TRegistryEntry]:
+        return frozenset(self._content)
+
     def __contains__(self, item: Any) -> bool:
-        return self._safe_key(item) in self._registry
+        return item in self._content or self._safe_key(item) in self._registry
 
     def __getitem__(self, item: Any) -> TRegistryEntry:
         return self._registry[self._safe_key(item)]
@@ -67,6 +72,7 @@ class Registry(Generic[TRegistryEntry]):
             raise ValueError()
 
         key = item.registry_key
+        self._content.add(item)
 
         if not isinstance(key, str) and hasattr(key, '__iter__'):
             for key_instance in key:
