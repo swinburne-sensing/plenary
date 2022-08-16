@@ -10,8 +10,6 @@ from typing import Any, List, Mapping, Type, TypeVar, Union
 __all__ = [
     'TObject',
     'get_subclasses',
-    'reference_from_str',
-    'instance_from_dict',
     'resolve_global'
 ]
 
@@ -34,70 +32,42 @@ def _recurse_subclasses(subclass_list: List[Type[TObject]]) -> List[Type[TObject
     return return_list
 
 
-def get_subclasses(class_root: Type[TObject]) -> List[Type[TObject]]:
+def get_subclasses(class_root: Type[TObject], include_parent: bool = True) -> List[Type[TObject]]:
     """ Get a list of subclasses for a given parent class.
 
     :param class_root: parent class type
+    :param include_parent: if True returned list includes the parent class, otherwise it is discarded
     :return: list
     """
-    return _recurse_subclasses([class_root])
+    subclass_list = _recurse_subclasses([class_root])
+
+    if not include_parent:
+        subclass_list.remove(class_root)
+
+    return subclass_list
 
 
-def import_submodules(package: Union[str, ModuleType], recursive: bool = True) -> None:
+def import_submodules(package: Union[str, ModuleType], recursive: bool = True) -> List[ModuleType]:
     """ Import all submodules within a given package.
 
     :param package: base package to begin import from
     :param recursive: if True then import submodules
+    :return: list of imported submodules
     """
     if isinstance(package, str):
         package = import_module(package)
 
+    import_list = []
+
     for loader, name, is_pkg in walk_packages(package.__path__):
         full_name = package.__name__ + '.' + name
 
-        import_module(full_name)
+        import_list.append(import_module(full_name))
 
         if recursive and is_pkg:
-            import_submodules(full_name)
+            import_list.extend(import_submodules(full_name))
 
-
-def reference_from_str(name: str, parent: Any) -> Any:
-    """ Get a class from a given module given the classes name as a string.
-
-    :param name:
-    :param parent:
-    :return:
-    """
-    if type(parent) is str:
-        try:
-            parent = sys.modules[parent]
-        except KeyError:
-            raise KeyError(f"Module {parent} is not available")
-
-    return functools.reduce(getattr, name.split('.'), parent)
-
-
-def instance_from_dict(config: Mapping[str, Any], parent: Any) -> Any:
-    """ Instantiate a class from a given module given a dict containing the class name as a value in the dict.
-
-    :param config: Object description as a dict, requires at least a value for 'class'
-    :param parent: Parent module of class
-    :return: class instance
-    """
-    # Create mutable copy of configuration
-    config = dict(config)
-
-    if 'class' in config:
-        class_name = config.pop('class')
-
-        class_type = reference_from_str(class_name, parent)
-        return class_type(**config)
-    elif 'method' in config:
-        method_name = config.pop('method')
-
-        return reference_from_str(method_name, parent)
-    else:
-        raise KeyError('Configuration dictionary requires either "class" or "method" key')
+    return import_list
 
 
 def resolve_global(name: str) -> Any:
