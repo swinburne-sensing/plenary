@@ -6,13 +6,17 @@ import subprocess
 import warnings
 from contextlib import contextmanager
 from enum import Enum
-from typing import Any, Generator, Mapping, Optional
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Generator, Mapping, Optional
 
-try:
-    # noinspection PyCompatibility
-    import winreg
-except ModuleNotFoundError:
-    winreg = None
+if TYPE_CHECKING:
+    winreg: Optional[ModuleType]
+else:
+    try:
+        # noinspection PyCompatibility
+        import winreg
+    except ModuleNotFoundError:
+        winreg: Optional[ModuleType] = None
 
 
 __all__ = [

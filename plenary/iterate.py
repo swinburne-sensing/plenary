@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import collections.abc
+import typing
 from itertools import tee
 from typing import Generator, Iterable, Iterator, Sequence, Tuple, TypeVar
 
@@ -23,12 +24,12 @@ def flatten(iterable: Iterable[TItem], flatten_str: bool = False) -> Iterator[TI
     for item in iterable:
         if isinstance(item, str):
             if len(item) == 1:
-                yield item[0]
+                yield typing.cast(TItem, item[0])
             elif flatten_str:
                 for char in item:
-                    yield char
+                    yield typing.cast(TItem, char)
             else:
-                yield item
+                yield typing.cast(TItem, item)
         elif isinstance(item, collections.abc.Iterable):
             for sub_item in flatten(item, flatten_str):
                 yield sub_item
