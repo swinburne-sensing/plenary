@@ -23,3 +23,7 @@ class GeneralTestCase(unittest.TestCase):
 
                     self.assertEqual(length, len(s))
                     self.assertTrue(set(s).issubset(self._CHAR_VALID))
+
+
+if __name__ == '__main__':
+    unittest.main()
