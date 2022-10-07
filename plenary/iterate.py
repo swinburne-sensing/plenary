@@ -6,6 +6,7 @@ from typing import Generator, Iterable, Iterator, Sequence, Tuple, TypeVar
 
 __all__ = [
     'flatten',
+    'nested_flatten',
     'chunk',
     'pair'
 ]
@@ -37,6 +38,15 @@ def flatten(iterable: Iterable[TItem], flatten_str: bool = False) -> Iterator[TI
             yield item
 
 
+def nested_flatten(iterable: Iterable[Iterable[TItem]]) -> Generator[TItem, None, None]:
+    """ Simple flattening from iterable of iterables to a single iterable.
+
+    :param iterable: iterable of iterables
+    :return: iterable
+    """
+    return (item for sublist in iterable for item in sublist)
+
+
 def chunk(data: Sequence[TItem], size: int) -> Generator[Sequence[TItem], None, None]:
     """ Get iterator to return portions of a sequence in chunks of a maximum size.
 
@@ -53,6 +63,8 @@ def chunk(data: Sequence[TItem], size: int) -> Generator[Sequence[TItem], None, 
 
 def pair(data: Iterable[TItem]) -> Iterator[Tuple[TItem, TItem]]:
     """ Get iterator to return pairs of elements from an iterable.
+
+    Performs identically to itertools.pairwise in Python 3.10.
 
     :param data: input iterator
     :return: iterator
