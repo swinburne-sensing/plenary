@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from itertools import chain
-from typing import (Any, Dict, Generic, Iterable, Iterator, List, Mapping, Set,
-                    Tuple, TypeVar)
+from collections.abc import Mapping as abc_Mapping
+from types import MappingProxyType
+from typing import (Dict, Generic, Iterable, Iterator, List, Mapping, Set,
+                    TypeVar)
 
 from plenary.iterate import nested_flatten
 
@@ -11,67 +12,82 @@ __all__ = [
 ]
 
 
+_K = TypeVar('_K')
 _V = TypeVar('_V')
 
 
-class PriorityChainMap(Generic[_V]):
-    def __init__(self, *initial: Mapping[str, _V]):
-        self._maps: Mapping[int, List[Mapping[str, _V]]] = defaultdict(list)
+class MappingProxy(abc_Mapping[_K, _V], Generic[_K, _V]):
+    def __init__(self, m: Mapping[_K, _V]):
+        self._target = MappingProxyType(m)
+
+    @property
+    def target(self) -> MappingProxyType[_K, _V]:
+        return self._target
+
+    @target.setter
+    def target(self, m: Mapping[_K, _V]) -> None:
+        self._target = MappingProxyType(m)
+
+    def __getitem__(self, __k: _K) -> _V:
+        return self.target[__k]
+
+    def __len__(self) -> int:
+        return len(self.target)
+
+    def __iter__(self) -> Iterator[_K]:
+        return self.target.__iter__()
+
+
+class PriorityChainMap(abc_Mapping[_K, _V], Generic[_K, _V]):
+    def __init__(self, *initial: Mapping[_K, _V]):
+        self._maps: Mapping[int, List[Mapping[_K, _V]]] = defaultdict(list)
 
         for m in initial:
             self.insert(m)
 
-    def _map_iterable(self, reverse_order: bool = False, reverse_list: bool = False) -> Iterable[Mapping[str, _V]]:
-        list_index = -1 if reverse_list else 1
-
-        return nested_flatten(
-            v[::list_index] for k, v in sorted(self._maps.items(), key=lambda p: p[0], reverse=reverse_order)
-        )
-
-    def insert(self, m: Mapping[str, _V], order: int = 0, append: bool = False) -> None:
-        if append:
-            self._maps[order].append(m)
-        else:
-            self._maps[order].insert(0, m)
-
-    def keys(self) -> Set[str]:
-        key_set: Set[str] = set()
+    def _key_set(self) -> Set[_K]:
+        key_set: Set[_K] = set()
 
         for m in self._map_iterable():
             key_set.update(m.keys())
 
         return key_set
 
-    def items(self) -> Iterable[Tuple[str, _V]]:
-        return chain(*(m.items() for m in self._map_iterable(True, True)))
+    def _map_iterable(self, reverse_order: bool = False, reverse_list: bool = False) -> Iterable[Mapping[_K, _V]]:
+        list_index = -1 if reverse_list else 1
 
-    def as_dict(self) -> Dict[str, _V]:
-        return dict(self.items())
+        return nested_flatten(
+            v[::list_index] for k, v in sorted(self._maps.items(), key=lambda p: p[0], reverse=reverse_order)
+        )
 
-    def __contains__(self, item: Any) -> bool:
-        if not isinstance(item, str):
-            raise KeyError('Only str keys are supported')
+    def insert(self, m: Mapping[_K, _V], order: int = 0, append: bool = False) -> None:
+        """ Insert a mapping into the chain at a specified position in the mapping order. If other mappings exist at
+        the supplied order index then the new mapping is appended or inserted into the order according to the append
+        argument.
 
-        for m_list in self._maps.values():
-            if any(item in m for m in m_list):
-                return True
+        :param m: mapping to add to the chain
+        :param order: order/priority, lower order mappings are returned over others when duplicate keys exist
+        :param append: if True append the mapping to the end of the mapping list for a given order, otherwise insert
+        """
+        if append:
+            self._maps[order].append(m)
+        else:
+            self._maps[order].insert(0, m)
 
-        return False
-
-    def __iter__(self) -> Iterator[str]:
-        return iter(self.keys())
-
-    def __getitem__(self, item: Any) -> _V:
-        if not isinstance(item, str):
-            raise KeyError('Only str keys are supported')
-
+    def __getitem__(self, __k: _K) -> _V:
         for m in self._map_iterable():
             try:
-                return m[item]
+                return m[__k]
             except KeyError:
                 continue
 
-        raise KeyError(f"Key {item!r} not found in any map")
+        raise KeyError(f"Key {__k!r} not found in any map")
 
     def __len__(self) -> int:
-        return len(self.keys())
+        return len(self._key_set())
+
+    def __iter__(self) -> Iterator[_K]:
+        return iter(self._key_set())
+
+    def to_dict(self) -> Dict[_K, _V]:
+        return dict(self.items())
