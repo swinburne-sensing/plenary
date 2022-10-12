@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 
 __author__ = 'Chris Harrison'
 __credits__ = [__author__]

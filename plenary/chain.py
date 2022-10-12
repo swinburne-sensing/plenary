@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from types import MappingProxyType
 from typing import (Dict, Generic, Iterable, Iterator, List, Mapping, Set,
                     TypeVar)
 
@@ -13,28 +12,6 @@ __all__ = [
 
 _K = TypeVar('_K')
 _V = TypeVar('_V')
-
-
-class MappingProxy(Mapping[_K, _V], Generic[_K, _V]):
-    def __init__(self, m: Mapping[_K, _V]):
-        self._target = MappingProxyType(m)
-
-    @property
-    def target(self) -> Mapping[_K, _V]:
-        return self._target
-
-    @target.setter
-    def target(self, m: Mapping[_K, _V]) -> None:
-        self._target = MappingProxyType(m)
-
-    def __getitem__(self, __k: _K) -> _V:
-        return self.target[__k]
-
-    def __len__(self) -> int:
-        return len(self.target)
-
-    def __iter__(self) -> Iterator[_K]:
-        return self.target.__iter__()
 
 
 class PriorityChainMap(Mapping[_K, _V], Generic[_K, _V]):
