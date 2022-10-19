@@ -8,6 +8,7 @@ from typing import Any, List, Type, TypeVar, Union
 __all__ = [
     'TObject',
     'get_subclasses',
+    'import_submodules',
     'resolve_global'
 ]
 
