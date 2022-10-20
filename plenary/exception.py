@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
@@ -8,11 +9,11 @@ from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
 
 @dataclass(frozen=True)
 class ExceptionWrapper:
-    exception: Exception
+    exception: BaseException
     traceback: TracebackType
     context: Optional[ExceptionCapture.Context] = None
 
-    def with_traceback(self) -> Exception:
+    def with_traceback(self) -> BaseException:
         return self.exception.with_traceback(self.traceback)
 
     def __str__(self) -> str:
@@ -41,7 +42,7 @@ class MultiExceptionWrapper(Exception):
         Exception.__init__(self, 'Multi-exception wrapper')
 
     @property
-    def exceptions(self) -> Tuple[Exception, ...]:
+    def exceptions(self) -> Tuple[BaseException, ...]:
         """ Access encapsulated exceptions.
 
         :return: frozen set of encapsulated exceptions
@@ -66,14 +67,14 @@ class MultiExceptionWrapper(Exception):
     def __getitem__(self, item: int) -> ExceptionWrapper:
         return self._exception_wrappers[item]
 
-    def __iter__(self) -> Iterator[Exception]:
+    def __iter__(self) -> Iterator[BaseException]:
         return iter(self.exceptions)
 
     def __str__(self) -> str:
         if len(self.exceptions) == 1:
             return str(self.exceptions[0])
 
-        return f"{Exception.__str__(self)} (contents: {', '.join(map(str, self.exceptions))})"
+        return f"{BaseException.__str__(self)} (contents: {', '.join(map(str, self.exceptions))})"
 
     def __repr__(self) -> str:
         if len(self.exceptions) == 1:
@@ -82,14 +83,14 @@ class MultiExceptionWrapper(Exception):
         return f"{self.__class__.__name__}({', '.join(map(repr, self.exceptions))})"
 
 
-class ExceptionCapture:
+class ExceptionCapture(AbstractContextManager):  # type: ignore
     class Context:
         def __init__(self, capture: ExceptionCapture, label: str,
-                     exception_filter: Optional[Iterable[Type[Exception]]] = None):
+                     exception_filter: Optional[Iterable[Type[BaseException]]] = None):
             self._capture = capture
             self._label = label
 
-            self._exception_filter: Optional[Tuple[Type[Exception], ...]] = None
+            self._exception_filter: Optional[Tuple[Type[BaseException], ...]] = None
 
             if exception_filter is not None:
                 exception_filter_tuple = tuple(exception_filter)
@@ -106,27 +107,28 @@ class ExceptionCapture:
             return self._label
 
         @property
-        def exception_filter(self) -> Optional[Tuple[Type[Exception], ...]]:
+        def exception_filter(self) -> Optional[Tuple[Type[BaseException], ...]]:
             return self._exception_filter
 
         def __enter__(self) -> ExceptionCapture.Context:
             return self
 
-        def __exit__(self, exc_type: Type[Exception], exc_val: Exception, exc_tb: TracebackType) -> Optional[bool]:
-            if exc_val is not None:
+        def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException],
+                     traceback: Optional[TracebackType]) -> Optional[bool]:
+            if exc_type is not None and exc_value is not None and traceback is not None:
                 if self.exception_filter is not None and not issubclass(exc_type, self.exception_filter):
                     # Not in filter, don't capture
                     return None
 
                 # Save exception in capture
-                self.capture.add(exc_val, exc_tb, context=self)
+                self.capture.add(exc_value, traceback, context=self)
 
                 # Exception handled!
                 return True
 
             return None
 
-    def __init__(self, exception_filter: Optional[Iterable[Type[Exception]]] = None):
+    def __init__(self, exception_filter: Optional[Iterable[Type[BaseException]]] = None):
         """
 
         :param exception_filter:
@@ -138,8 +140,8 @@ class ExceptionCapture:
         # Create a root context for when this object is used as a context manager
         self._root_context = self.Context(self, '<root context>', self.exception_filter)
 
-    def add(self, exception: Exception, traceback: TracebackType, context: Optional[ExceptionCapture.Context] = None,
-            append: bool = True) -> None:
+    def add(self, exception: BaseException, traceback: TracebackType,
+            context: Optional[ExceptionCapture.Context] = None, append: bool = True) -> None:
         """
 
         :param exception:
@@ -159,11 +161,11 @@ class ExceptionCapture:
         return tuple(self._exception_buffer)
 
     @property
-    def exceptions(self) -> Tuple[Exception, ...]:
+    def exceptions(self) -> Tuple[BaseException, ...]:
         return tuple(x.exception for x in self._exception_buffer)
 
     @property
-    def exception_filter(self) -> Optional[Tuple[Type[Exception], ...]]:
+    def exception_filter(self) -> Optional[Tuple[Type[BaseException], ...]]:
         return self._exception_filter
 
     def raise_buffered(self) -> None:
@@ -177,7 +179,7 @@ class ExceptionCapture:
             # Raise all exceptions in an exception list
             raise MultiExceptionWrapper(self._exception_buffer)
 
-    def context(self, label: str, exception_filter: Optional[Iterable[Type[Exception]]] = None,
+    def context(self, label: str, exception_filter: Optional[Iterable[Type[BaseException]]] = None,
                 inherit_filter: bool = True) -> ExceptionCapture.Context:
         """ Create a new context for capture of exceptions. Allows the same capture object to be used multiple times
         with labelled contexts providing means to sort the resulting exceptions.
@@ -209,6 +211,7 @@ class ExceptionCapture:
         # Use root context manager
         return self._root_context.__enter__()
 
-    def __exit__(self, exc_type: Type[Exception], exc_val: Exception, exc_tb: TracebackType) -> Optional[bool]:
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException],
+                 traceback: Optional[TracebackType]) -> Optional[bool]:
         # Pass to root context manager
-        return self._root_context.__exit__(exc_type, exc_val, exc_tb)
+        return self._root_context.__exit__(exc_type, exc_value, traceback)
