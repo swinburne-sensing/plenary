@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 from datetime import datetime, timezone
 from getpass import getuser
 from socket import getfqdn
 from tempfile import gettempdir
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping, Optional, Tuple
 
 from plenary import constant, localtime
 
 __all__ = [
-    'generate_format'
+    'generate_format',
+    'parse_key_value_pair'
 ]
 
 
@@ -21,6 +23,9 @@ _format_system: Mapping[str, str] = {
 }
 
 _format_env: Mapping[str, str] = {'env_' + env_var: env_val for env_var, env_val in os.environ.items()}
+
+# Regex for key=value type string pairs
+_re_key_value = re.compile(r'^(\w+)\s*=\s*([\w\s]+)$')
 
 
 def generate_format(format_spec: str, *args: Any, generate_timestamp: Optional[datetime] = None,
@@ -71,3 +76,12 @@ def generate_format(format_spec: str, *args: Any, generate_timestamp: Optional[d
     format_mapping.update(kwargs)
 
     return format_spec.format(*args, **format_mapping)
+
+
+def parse_key_value_pair(value: str) -> Tuple[str, str]:
+    match = _re_key_value.match(value)
+
+    if not match:
+        raise ValueError(f"Key-value pair did not match expected format <key>=<value> (got: {value!r})")
+
+    return match[1].strip(), match[2].strip()

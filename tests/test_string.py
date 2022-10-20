@@ -65,6 +65,18 @@ class StringTestCase(unittest.TestCase):
         with self.assertRaises(KeyError):
             string.generate_format('{env_PATH}', include_env=False)
 
+    def test_key_value_parse(self):
+        key, value = string.parse_key_value_pair('hello=world')
+
+        self.assertEqual('hello', key)
+        self.assertEqual('world', value)
+
+    def test_key_value_parse_space(self):
+        key, value = string.parse_key_value_pair('hello = world this is a message')
+
+        self.assertEqual('hello', key)
+        self.assertEqual('world this is a message', value)
+
 
 if __name__ == '__main__':
     unittest.main()
