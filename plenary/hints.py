@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from inspect import Parameter
-from typing import Any, FrozenSet, Sequence, Set, Tuple, Type, Union
+from typing import Any, FrozenSet, Type, Union
 
 from plenary import iterate
 
