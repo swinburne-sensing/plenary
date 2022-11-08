@@ -77,6 +77,12 @@ class StringTestCase(unittest.TestCase):
         self.assertEqual('hello', key)
         self.assertEqual('world this is a message', value)
 
+    def test_key_value_parse_special(self):
+        key, value = string.parse_key_value_pair('hello = world@place.com')
+
+        self.assertEqual('hello', key)
+        self.assertEqual('world@place.com', value)
+
 
 if __name__ == '__main__':
     unittest.main()

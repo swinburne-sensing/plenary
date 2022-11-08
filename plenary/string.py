@@ -25,7 +25,7 @@ _format_system: Mapping[str, str] = {
 _format_env: Mapping[str, str] = {'env_' + env_var: env_val for env_var, env_val in os.environ.items()}
 
 # Regex for key=value type string pairs
-_re_key_value = re.compile(r'^(\w+)\s*=\s*([\w\s]+)$')
+_re_key_value = re.compile(r'^(\w+)\s*=\s*(.*)$')
 
 
 def generate_format(format_spec: str, *args: Any, generate_timestamp: Optional[datetime] = None,
