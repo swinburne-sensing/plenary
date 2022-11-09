@@ -225,5 +225,22 @@ class ExceptionTestCase(unittest.TestCase):
             self.assertEqual(AlternateError, type(mex[1].exception))
 
 
+class CauseTestCase(unittest.TestCase):
+    def test_cause(self):
+        try:
+            try:
+                raise ExampleError('cause error')
+            except ExampleError as exc:
+                raise AlternateError('another error') from exc
+        except AlternateError as exc:
+            exc_iterator = exception.cause_iterator(exc)
+            exc_list = list(exc_iterator)
+
+            self.assertListEqual(
+                list(map(str, exc_list)),
+                ['another error', 'cause error']
+            )
+
+
 if __name__ == '__main__':
     unittest.main()

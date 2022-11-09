@@ -4,7 +4,8 @@ from __future__ import annotations
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from types import TracebackType
-from typing import Any, Iterable, Iterator, List, Optional, Tuple, Type
+from typing import (Any, Generator, Iterable, Iterator, List, Optional, Tuple,
+                    Type)
 
 
 @dataclass(frozen=True)
@@ -215,3 +216,16 @@ class ExceptionCapture(AbstractContextManager):  # type: ignore
                  traceback: Optional[TracebackType]) -> Optional[bool]:
         # Pass to root context manager
         return self._root_context.__exit__(exc_type, exc_value, traceback)
+
+
+def cause_iterator(exc: BaseException) -> Generator[BaseException, None, None]:
+    """ Iterate through a tree of Exceptions beginning at the supplied exception then iterating through `__cause__`.
+
+    :param exc: root exception
+    :return: cause iterator
+    """
+    exc_ptr: Optional[BaseException] = exc
+
+    while exc_ptr is not None:
+        yield exc_ptr
+        exc_ptr = exc_ptr.__cause__
